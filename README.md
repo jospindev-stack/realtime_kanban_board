@@ -2,6 +2,7 @@
 
 > A collaborative Kanban board built with **React**, **Express**, **MongoDB**, and **Socket.io**, featuring real-time task synchronization, drag-and-drop management, and JWT authentication.
 
+![CI](https://github.com/jospindev-stack/realtime_kanban_board/actions/workflows/ci.yml/badge.svg)
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)
 ![Node.js](https://img.shields.io/badge/Node.js-Express-339933?logo=node.js)
 ![Socket.io](https://img.shields.io/badge/Socket.io-4.7-010101?logo=socket.io)
@@ -15,7 +16,7 @@
 
 Realtime Kanban Board is a Trello-inspired task management application that allows multiple users to collaborate in real time.
 
-The project demonstrates modern full-stack web development using **React**, **Express**, **MongoDB**, and **Socket.io**, with real-time synchronization, JWT authentication, and an intuitive drag-and-drop interface.
+The project demonstrates modern full-stack web development using **React**, **Express**, **MongoDB**, and **Socket.io**, with real-time synchronization, JWT authentication, automated backend tests, and CI validation.
 
 ---
 
@@ -30,6 +31,8 @@ The project demonstrates modern full-stack web development using **React**, **Ex
 | Real-Time Communication | Socket.io             |
 | Styling                 | Tailwind CSS          |
 | Drag & Drop             | @hello-pangea/dnd     |
+| Testing                 | Node.js test runner   |
+| CI                      | GitHub Actions        |
 
 ---
 
@@ -57,11 +60,17 @@ The project demonstrates modern full-stack web development using **React**, **Ex
 ```text
 realtime-kanban-board/
 │
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 ├── package.json
 ├── .env.example
 │
 ├── backend/
 │   ├── package.json
+│   ├── test/
+│   │   ├── auth.test.js
+│   │   └── socket.test.js
 │   └── src/
 │       ├── index.js
 │       ├── config/
@@ -148,8 +157,8 @@ All connected clients update instantly
 Clone the repository:
 
 ```bash
-git clone https://github.com/jospindev-stack/realtime-kanban-board.git
-cd realtime-kanban-board
+git clone https://github.com/jospindev-stack/realtime_kanban_board.git
+cd realtime_kanban_board
 ```
 
 Install all dependencies:
@@ -176,11 +185,8 @@ Edit `backend/.env` and provide:
 
 ```env
 MONGODB_URL=your_connection_string
-
 JWT_SECRET=your_random_secret
-
 PORT=3001
-
 CLIENT_URL=http://localhost:5173
 ```
 
@@ -202,7 +208,7 @@ npm run dev:backend
 
 Backend:
 
-```
+```text
 http://localhost:3001
 ```
 
@@ -214,11 +220,49 @@ npm run dev:frontend
 
 Application:
 
-```
+```text
 http://localhost:5173
 ```
 
 Open two browser windows to verify that changes are synchronized in real time.
+
+---
+
+## Testing
+
+The backend test suite uses the native Node.js test runner and does not require a live MongoDB instance.
+
+Run the tests locally:
+
+```bash
+cd backend
+npm test
+```
+
+The suite currently covers:
+
+- registration validation and duplicate-user handling
+- valid and invalid login flows
+- Socket.io authentication with JWT
+- online-user presence broadcasts
+- initial board synchronization
+- card creation and missing-card errors
+- card movement and cross-column reordering
+
+Mongoose model operations are mocked in the tests so backend behavior can be validated deterministically without external infrastructure.
+
+---
+
+## Continuous Integration
+
+GitHub Actions runs the backend test suite automatically on pushes to `main`, pushes to `test/**` branches, and pull requests targeting `main`.
+
+The CI workflow uses Node.js 20 and executes:
+
+```bash
+npm ci
+npm test
+```
 
 ---
 
@@ -262,17 +306,6 @@ POST /api/auth/register
 }
 ```
 
-Response:
-
-```json
-{
-  "token": "...",
-  "user": {}
-}
-```
-
----
-
 ### Login
 
 ```http
@@ -283,15 +316,6 @@ POST /api/auth/login
 {
   "email": "alice@example.com",
   "password": "secret123"
-}
-```
-
-Response:
-
-```json
-{
-  "token": "...",
-  "user": {}
 }
 ```
 
@@ -325,10 +349,7 @@ The application includes:
 
 ### Backend
 
-Deploy the backend to platforms such as:
-
-- Railway
-- Render
+Deploy the backend to platforms such as Railway or Render.
 
 Start command:
 
@@ -336,33 +357,13 @@ Start command:
 node src/index.js
 ```
 
-Required environment variables:
-
-- `MONGODB_URL`
-- `JWT_SECRET`
-- `PORT`
-- `CLIENT_URL`
-
----
-
 ### Frontend
 
-Deploy the frontend to:
-
-- Vercel
-- Netlify
-
-Build:
+Deploy the frontend to Vercel or Netlify.
 
 ```bash
 cd frontend
 npm run build
-```
-
-Generated files:
-
-```
-frontend/dist
 ```
 
 Configure the frontend to communicate with the deployed backend using `VITE_API_URL` and secure WebSocket connections (`wss://`).
@@ -380,8 +381,7 @@ Planned improvements include:
 - Due dates
 - Notifications
 - Dark mode
-- Unit tests
-- Integration tests
+- Frontend component tests
 - Docker support
 
 ---
@@ -389,8 +389,6 @@ Planned improvements include:
 ## License
 
 This project is licensed under the **MIT License**.
-
-You are free to use, modify, and distribute it under the terms of the license.
 
 ---
 
